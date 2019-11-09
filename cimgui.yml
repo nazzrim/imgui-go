@@ -7,8 +7,7 @@ GENERATOR:
     SafeStrings: true
     StructAccessors: true
   FlagGroups:
-    - {name: "LDFLAGS", flags: [-lpd]}
-    - {name: "CXXFLAGS", flags: [-std=c++11]}
+    - {name: LDFLAGS, flags: [-lcimgui]}
 
 PARSER:
   IncludePaths:
@@ -18,6 +17,8 @@ PARSER:
     CIMGUI_DEFINE_ENUMS_AND_STRUCTS: 1
     __builtin_va_start: {}
     __builtin_va_end: {}
+    # add the following line to all generated .go files which include "C" and cgo_helper.h
+    #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS 1
 
 TRANSLATOR:
   ConstRules:
@@ -25,8 +26,24 @@ TRANSLATOR:
     enum: expand
   Rules:
     global:
+      # include everything
       - {action: accept, from: "^ig"}
       - {action: accept, from: "^Im"}
+      # ignore variadic functions
+      - {action: ignore, from: "^igText$"}
+      - {action: ignore, from: "^igTextColored$"}
+      - {action: ignore, from: "^igTextDisabled$"}
+      - {action: ignore, from: "^igTextWrapped$"}
+      - {action: ignore, from: "^igLabelText$"}
+      - {action: ignore, from: "^igBulletText$"}
+      - {action: ignore, from: "^igTreeNodeStrStr$"}
+      - {action: ignore, from: "^igTreeNodePtr$"}
+      - {action: ignore, from: "^igTreeNodeExStrStr$"}
+      - {action: ignore, from: "^igTreeNodeExPtr$"}
+      - {action: ignore, from: "^igSetTooltip$"}
+      - {action: ignore, from: "^igLogText$"}
+      - {action: ignore, from: "^ImGuiTextBuffer_appendf$"}
+      # remove prefix
       - {action: replace, from: "^ig"}
       - {action: replace, from: "^ImGui"}
       - {action: replace, from: "^ImVec2_ImVec2", to: "ImVec2"}
@@ -34,9 +51,11 @@ TRANSLATOR:
       - {action: replace, from: "^ImGuiStoragePair_ImGuiStoragePair", to: "ImGuiStoragePair"}
       - {transform: export}
     const:
+      # include everything
       - {action: accept, from: "^Im"}
       - {transform: export}
     type:
+      # include everything
       - {action: accept, from: "^Im"}
       - {transform: export}
     private:
